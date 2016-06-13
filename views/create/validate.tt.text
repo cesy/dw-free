@@ -1,0 +1,4 @@
+.title=Welcome to [[sitename]]
+.post=Paragraph lorem ipsum
+
+.error.identity_no_email=You do not have an email address set. Go <a [[aopts]]>here</a> to set one.

@@ -40,13 +40,14 @@ my %urls = (
     setup   => '/create/setup',
     upgrade => '/create/upgrade',
     next    => '/create/next',
+    validate => '/register',
 );
 
 DW::Routing->register_string( $urls{create}, \&create_handler, app => 1, prefer_ssl => 1 );
 DW::Routing->register_string( $urls{setup}, \&setup_handler, app => 1 );
 DW::Routing->register_string( $urls{upgrade}, \&upgrade_handler, app => 1 );
 DW::Routing->register_string( $urls{next}, \&next_handler, app => 1 );
-
+DW::Routing->register_string( $urls{validate}, \&validate_handler, app => 1 );
 
 sub create_handler {
     my ( $opts ) = @_;
@@ -273,7 +274,7 @@ sub create_handler {
         $rate_ok = DW::InviteCodes->check_rate if $code;
 
         # but we don't always need to block the registration on the validity of the code
-        # (if we have an invalid code, but we do don't require codes to open an account, just fail silently)
+        # (if we have an invalid code, but we don't require codes to open an account, just fail silently)
         $code_valid = DW::InviteCodes->check_code( code => $code )
             if $LJ::USE_ACCT_CODES;
     }
@@ -642,6 +643,31 @@ sub next_handler {
         steps_to_show   => [ steps_to_show( $step ) ],
         step            => $step,
     } );
+}
+
+sub validate_handler {
+    # what does this line do - do I need it?
+    my $ret;
+
+    # not yet sure if this pair work
+    my $r = DW::Request->get;
+    my $qs = $r->get_args->{mode};
+
+    my $remote = LJ::get_remote();
+
+    # this is the bit I'm exploring now
+    my $noemail;
+    if ( $remote && $remote->is_identity && !$remote->email_raw ) {
+        $noemail = 1;
+        } else {
+        $noemail = 0;
+        }
+
+    my $vars = {
+        noemail         => $noemail,
+        qs              => $qs,
+    };
+    return DW::Template->render_template( 'create/validate.tt', $vars );
 }
 
 sub steps_to_show {

@@ -1001,7 +1001,7 @@ sub trans
 
     # confirm
     if ($uri =~ m!^/confirm/(\w+\.\w+)!) {
-        return redir($apache_r, "$LJ::SITEROOT/register.bml?$1");
+        return redir($apache_r, "$LJ::SITEROOT/register?$1");
     }
 
     return FORBIDDEN if $uri =~ m!^/userpics!;
